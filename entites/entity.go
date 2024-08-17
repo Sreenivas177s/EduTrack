@@ -1,16 +1,5 @@
 package entites
 
-type Entity struct {
-	name        string
-	endpoint    string
-	httpHandler EntityMethods
-}
+import "github.com/gofiber/fiber/v2"
 
-// http methods to be implemented by
-type EntityMethods interface {
-	post()
-	put()
-	delete()
-	get()
-	getall()
-}
+type HandleApi func(ctx *fiber.Ctx) string
