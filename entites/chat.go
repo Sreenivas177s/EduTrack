@@ -1,6 +1,6 @@
 package entites
 
-// import "github.com/gofiber/fiber/v2"
+import "github.com/gofiber/fiber/v2"
 
 type Chat struct {
 	id        uint32
@@ -9,5 +9,17 @@ type Chat struct {
 	createdAt string //unix-epoch
 }
 
-// func (chat *Chat) HandleApi(ctx *fiber.Ctx) string {
-// }
+func (chat *Chat) Name() string {
+	return chat.name
+}
+func (chat *Chat) IsApiEnabled() bool {
+	return true
+}
+
+type ChatMWCFactory struct{}
+
+func (*ChatMWCFactory) getMiddlewares(httpMethod string) []fiber.Handler {
+	chain := make([]fiber.Handler, 0, 10)
+
+	return chain
+}
