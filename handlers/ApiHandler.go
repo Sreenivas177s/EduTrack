@@ -1,31 +1,52 @@
 package ApiHandler
 
 import (
-	"chat-server/entites"
-	"fmt"
+	"chat-server/entity"
+	"chat-server/utils"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
-func HandleApiCall(ctx *fiber.Ctx) error {
+func HandleApiCall(app fiber.Router) error {
+	// route will start as '/api'
+	// parse entity data
+	app.Use(entity.ParseEntityData)
 
-	httpMethod := ctx.Method()
+	//handle necessary middle wares
+	// // POST HANDLER
+	// app.Post(`/:entity`)
 
-	apiApp := ctx.App()
-	apiApp.Group("/:entity")
-	entity := ctx.Params("entity")
-	mwcbuilder := entites.GetEntityMapping(entity)
+	// GET HANDLER
+	app.Get(`/:entity/:entityid?`, func(ctx *fiber.Ctx) error {
+		log.Debug(ctx.Locals(utils.EntityEventData))
+		return ctx.Next()
+	})
 
-	switch httpMethod {
-	case fiber.MethodGet:
-		mwc, _ := mwcbuilder.getEntityMiddlewares(httpMethod)
-		apiApp.Get("/:entityid?", mwc)
-	default:
-		panic("savu da")
-	}
+	// // PUT HANDLER
+	// app.Put(`/:entity/:entityid`)
 
-	return ctx.SendString(fmt.Sprintf("e = %s ei = %s", ctx.Params("entity"), ctx.Params("entityid")))
+	// // DELETE HANDLER
+	// app.Delete(`/:entity/:entityid`)
+
+	// httpMethod := ctx.Method()
+
+	// entityName := ctx.Params("entity")
+	// // version := ctx.Params("version")
+	// mwcbuilder := entity.GetEntityMapping(entityName)
+	// log.Debug(ctx.AllParams())
+
+	// switch httpMethod {
+	// case fiber.MethodGet:
+	// 	mwc, _ := mwcbuilder.GetMiddlewares(httpMethod)
+	// default:
+	// 	panic("savu da")
+	// }
+
+	return nil
 }
-func getEntityHandler(entity string) string {
-	return "asdasd"
+
+func UrlNotFound(ctx *fiber.Ctx) error {
+	ctx.Status(fiber.StatusNotFound)
+	return ctx.JSON(NOT_FOUND_JSON)
 }
