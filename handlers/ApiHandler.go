@@ -10,12 +10,13 @@ import (
 
 func HandleApiCall(app fiber.Router) error {
 	// route will start as '/api'
+
 	// parse entity data
 	app.Use(entity.ParseEntityData)
 
 	//handle necessary middle wares
-	// // POST HANDLER
-	// app.Post(`/:entity`)
+	// POST HANDLER
+	app.Post(`/:entity`, entity.Accumulator)
 
 	// GET HANDLER
 	app.Get(`/:entity/:entityid?`, func(ctx *fiber.Ctx) error {
@@ -49,4 +50,13 @@ func HandleApiCall(app fiber.Router) error {
 func UrlNotFound(ctx *fiber.Ctx) error {
 	ctx.Status(fiber.StatusNotFound)
 	return ctx.JSON(NOT_FOUND_JSON)
+}
+
+func handlePOST() []fiber.Handler {
+	return []fiber.Handler{
+		// validator(),
+		// preprocessor(),
+		entity.Accumulator,
+		// postprocessor(),
+	}
 }

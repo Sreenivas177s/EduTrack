@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 type EntityEvent struct {
@@ -26,13 +27,18 @@ func ParseEntityData(ctx *fiber.Ctx) error {
 			return err
 		}
 	}
-
+	entityName := ctx.Params("entity")
 	event := &EntityEvent{
 		method:     ctx.Method(),
-		entityName: ctx.Params("entity"),
+		entityName: entityName,
 		entityid:   entityid,
 		apiversion: ctx.Params("version"),
 	}
 	ctx.Locals(utils.EntityEventData, event)
+	log.Debug(event)
 	return nil
+}
+
+func getEntityEvent(ctx *fiber.Ctx) EntityEvent {
+	return ctx.Locals(utils.EntityEventData).(EntityEvent)
 }
