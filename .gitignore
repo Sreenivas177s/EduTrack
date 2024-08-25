@@ -1,0 +1,7 @@
+#folders
+logs*
+
+# files
+go.sum
+.env
+*.exe*

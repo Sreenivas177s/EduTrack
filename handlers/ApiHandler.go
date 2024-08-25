@@ -1,4 +1,4 @@
-package ApiHandler
+package Handler
 
 import (
 	"chat-server/entity"
@@ -8,15 +8,13 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 )
 
-func HandleApiCall(app fiber.Router) error {
+func HandleApiCall(app fiber.Router) {
 	// route will start as '/api'
 
-	// parse entity data
-	app.Use(entity.ParseEntityData)
+	//handle entity independant middle wares here
 
-	//handle necessary middle wares
 	// POST HANDLER
-	app.Post(`/:entity`, entity.Accumulator)
+	app.Post(`/:entity`, handlePOST()...)
 
 	// GET HANDLER
 	app.Get(`/:entity/:entityid?`, func(ctx *fiber.Ctx) error {
@@ -30,21 +28,7 @@ func HandleApiCall(app fiber.Router) error {
 	// // DELETE HANDLER
 	// app.Delete(`/:entity/:entityid`)
 
-	// httpMethod := ctx.Method()
-
-	// entityName := ctx.Params("entity")
-	// // version := ctx.Params("version")
-	// mwcbuilder := entity.GetEntityMapping(entityName)
-	// log.Debug(ctx.AllParams())
-
-	// switch httpMethod {
-	// case fiber.MethodGet:
-	// 	mwc, _ := mwcbuilder.GetMiddlewares(httpMethod)
-	// default:
-	// 	panic("savu da")
-	// }
-
-	return nil
+	app.All("/*", UrlNotFound)
 }
 
 func UrlNotFound(ctx *fiber.Ctx) error {
@@ -54,9 +38,10 @@ func UrlNotFound(ctx *fiber.Ctx) error {
 
 func handlePOST() []fiber.Handler {
 	return []fiber.Handler{
-		// validator(),
-		// preprocessor(),
-		entity.Accumulator,
-		// postprocessor(),
+		entity.ParseEntityData,
+		entity.Validator,
+		// entity.preprocessor(),
+		// entity.Accumulator,
+		entity.Postprocessor,
 	}
 }

@@ -1,4 +1,4 @@
-package ApiHandler
+package Handler
 
 import "github.com/gofiber/fiber/v2"
 
