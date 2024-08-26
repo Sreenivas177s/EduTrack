@@ -25,7 +25,8 @@ func main() {
 	// return not found
 	app.All("/*", Handler.ServeNotFoundHTML)
 	defer accessLogger.Close()
-	log.Fatal(app.Listen(fmt.Sprintf("%s:%s", os.Getenv("DEV_HOST"), os.Getenv("DEV_PORT"))))
+	url := fmt.Sprintf("%s:%s", os.Getenv("DEV_HOST"), os.Getenv("DEV_PORT"))
+	log.Fatal(app.Listen(url))
 }
 
 func initAppInstance() *fiber.App {

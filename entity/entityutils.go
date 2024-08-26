@@ -33,3 +33,5 @@ func EnforceHeaders(ctx *fiber.Ctx) error {
 
 	return ctx.Next()
 }
+
+var EmptyHandler = func(ctx *fiber.Ctx) error { return ctx.Next() }

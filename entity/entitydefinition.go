@@ -8,6 +8,8 @@ import (
 )
 
 type Entity interface {
+	ApplyDefaultValues()
+	NewWithDefaults()
 }
 
 type EntityEvent struct {
