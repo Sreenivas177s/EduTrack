@@ -45,5 +45,8 @@ func ParseEntityEvent(ctx *fiber.Ctx) error {
 
 func getEntityEvent(ctx *fiber.Ctx) *EntityEvent {
 	data := ctx.Locals(utils.EntityEventData)
-	return data.(*EntityEvent)
+	if data != nil {
+		return data.(*EntityEvent)
+	}
+	return nil
 }

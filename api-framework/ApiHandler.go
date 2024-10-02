@@ -13,10 +13,10 @@ func HandleApiCall(app fiber.Router) {
 	// route will start as '/api/version'
 
 	//parse entity event
-	app = app.Use("api", EnforceHeaders, ParseEntityEvent)
+	app = app.Use("/*", EnforceHeaders, ParseEntityEvent)
 
 	// POST HANDLER
-	app.Post(`/:entity`, ParseEntityEvent, handlePOST)
+	app.Post(`/:entity`, handlePOST)
 
 	// GET HANDLER
 	app.Get(`/:entity/:entityid?`, func(ctx *fiber.Ctx) error {
@@ -35,6 +35,9 @@ func HandleApiCall(app fiber.Router) {
 
 func handlePOST(ctx *fiber.Ctx) error {
 	event := getEntityEvent(ctx)
+	if event == nil {
+		return ctx.SendStatus(fiber.StatusInternalServerError)
+	}
 	// allocate and populate data
 	ipType := GetDefinedType(event.entityName)
 	ipValue := reflect.New(ipType)
@@ -53,7 +56,12 @@ func handlePOST(ctx *fiber.Ctx) error {
 	//post persistence handling
 	executeMethod(ipValue, entity.METHOD_POST_PROCESSOR, nil)
 
-	ctx.Locals(utils.EntityResponse, inputData)
+	isSuccess := true
+	if isSuccess {
+		response := utils.ConstructResponse(fiber.StatusCreated, "", inputData.(entity.Entity))
+		ctx.Status(fiber.StatusCreated)
+		return ctx.JSON(response)
+	}
 	return ctx.Next()
 }
 

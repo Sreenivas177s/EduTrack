@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"chat-server/api-framework/entity"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -30,4 +31,16 @@ func ServeNotFoundHTML(ctx *fiber.Ctx) error {
 	path := filepath.Join(".", "static", "not-found.html")
 	ctx.Status(fiber.StatusNotFound)
 	return ctx.SendFile(path)
+}
+func ConstructResponse(status int, message string, responseData entity.Entity) fiber.Map {
+	response := fiber.Map{
+		"status": status,
+	}
+	if message != "" {
+		response["message"] = message
+	}
+	if responseData != nil {
+		response["data"] = responseData
+	}
+	return response
 }

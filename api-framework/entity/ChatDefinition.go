@@ -10,9 +10,9 @@ type Chat struct {
 	Scope       string `json:"scope"`
 }
 
-// func (c Chat) New() Entity {
-// 	return Chat{}
-// }
+func (c Chat) New() Entity {
+	return Chat{}
+}
 
 func (chat *Chat) Validate() {
 	chat.Id = 1
