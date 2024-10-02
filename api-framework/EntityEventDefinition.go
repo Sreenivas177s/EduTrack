@@ -1,4 +1,4 @@
-package entity
+package apiframework
 
 import (
 	"chat-server/utils"
@@ -7,11 +7,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type Entity interface {
-	ApplyDefaultValues()
-	NewWithDefaults()
-}
-
 type EntityEvent struct {
 	method     string
 	entityid   int64
@@ -19,7 +14,7 @@ type EntityEvent struct {
 	apiversion string
 }
 
-func ParseEntityData(ctx *fiber.Ctx) error {
+func ParseEntityEvent(ctx *fiber.Ctx) error {
 	var (
 		entityid   int64
 		err        error

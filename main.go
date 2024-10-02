@@ -1,7 +1,7 @@
 package main
 
 import (
-	Handler "chat-server/handlers"
+	apiframework "chat-server/api-framework"
 	"chat-server/utils"
 	"fmt"
 	"os"
@@ -19,11 +19,11 @@ func main() {
 	}
 	app := initAppInstance()
 	accessLogger := utils.RegisterAccessLogger(app)
-	Handler.HandleApiCall(app.Group(`/api/:version<regex(v\d{1,2})>`))
+	apiframework.HandleApiCall(app.Group(`/api/:version<regex(v\d{1,2})>`))
 	// ws := app.Group("/ws/v1")
 
 	// return not found
-	app.All("/*", Handler.ServeNotFoundHTML)
+	app.All("/*", utils.ServeNotFoundHTML)
 	defer accessLogger.Close()
 	url := fmt.Sprintf("%s:%s", os.Getenv("DEV_HOST"), os.Getenv("DEV_PORT"))
 	log.Fatal(app.Listen(url))

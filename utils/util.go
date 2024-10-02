@@ -26,3 +26,8 @@ func RegisterAccessLogger(app *fiber.App) *os.File {
 	app.Use(logger.New(config))
 	return file
 }
+func ServeNotFoundHTML(ctx *fiber.Ctx) error {
+	path := filepath.Join(".", "static", "not-found.html")
+	ctx.Status(fiber.StatusNotFound)
+	return ctx.SendFile(path)
+}
