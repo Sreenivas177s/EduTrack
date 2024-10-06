@@ -10,9 +10,6 @@ RUN go mod download
 
 COPY  . .
 
-#generate go struct for configured databases
-RUN sqlc generate
-
 RUN go build -o main .
 
 EXPOSE 8080
