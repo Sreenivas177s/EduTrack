@@ -7,6 +7,7 @@ import (
 
 var entityMapping map[string]reflect.Type = map[string]reflect.Type{
 	"chats": reflect.TypeOf(entity.Chat{}),
+	"users": reflect.TypeOf(entity.User{}),
 }
 
 func GetDefinedType(dtype string) reflect.Type {

@@ -2,6 +2,7 @@ package main
 
 import (
 	apiframework "chat-server/api-framework"
+	"chat-server/database"
 	"chat-server/utils"
 	"fmt"
 	"os"
@@ -17,6 +18,9 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		panic("Error while loading env file")
 	}
+	// initializing data base
+	database.InitDataBase()
+
 	app := initAppInstance()
 	accessLogger := utils.RegisterAccessLogger(app)
 	apiframework.HandleApiCall(app.Group(`/api/:version<regex(v\d{1,2})>`))

@@ -5,3 +5,4 @@ logs*
 go.sum
 .env
 *.exe*
+todo.txt

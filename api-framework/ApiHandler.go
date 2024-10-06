@@ -45,16 +45,18 @@ func handlePOST(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(inputData); err != nil {
 		return err
 	}
+	methodParams := make([]reflect.Value, 1)
+	methodParams[0] = reflect.ValueOf(ctx.Method())
 	// validate input data
-	executeMethod(ipValue, entity.METHOD_VALIDATOR, nil)
+	executeMethod(ipValue, entity.METHOD_VALIDATOR, methodParams)
 
 	// pre persistence handling
-	executeMethod(ipValue, entity.METHOD_PRE_PROCESSOR, nil)
+	executeMethod(ipValue, entity.METHOD_PRE_PROCESSOR, methodParams)
 
 	// add the provided data into persistence layer
 
 	//post persistence handling
-	executeMethod(ipValue, entity.METHOD_POST_PROCESSOR, nil)
+	executeMethod(ipValue, entity.METHOD_POST_PROCESSOR, methodParams)
 
 	isSuccess := true
 	if isSuccess {
