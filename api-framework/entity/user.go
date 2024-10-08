@@ -1,6 +1,8 @@
 package entity
 
-import "reflect"
+import (
+	"gorm.io/gorm"
+)
 
 type UserStatus int
 
@@ -11,7 +13,7 @@ const (
 )
 
 type User struct {
-	ApiBase
+	gorm.Model
 	FirstName    string     `json:"first_name"`
 	LastName     string     `json:"last_name"`
 	EmailId      string     `json:"email_id"`
@@ -19,7 +21,10 @@ type User struct {
 	Status       UserStatus `json:"user_status"`
 }
 
-func (user *User) Validate(params []reflect.Value) {
+func (user *User) Validate(httpMethod string) {
 	// httpMethod := params[0]
 
+}
+func (c *User) New() Entity {
+	return Chat{}
 }

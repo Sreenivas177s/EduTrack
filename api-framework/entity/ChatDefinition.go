@@ -1,6 +1,8 @@
 package entity
 
-import "github.com/gofiber/fiber/v2/log"
+import (
+	"github.com/gofiber/fiber/v2/log"
+)
 
 type Chat struct {
 	ApiBase
@@ -14,7 +16,7 @@ func (c Chat) New() Entity {
 	return Chat{}
 }
 
-func (chat *Chat) Validate() {
+func (chat *Chat) Validate(httpMethod string) {
 	chat.Id = 1
 	log.Debug("validator reached")
 }

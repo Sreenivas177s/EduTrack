@@ -2,7 +2,6 @@ package main
 
 import (
 	apiframework "chat-server/api-framework"
-	"chat-server/database"
 	"chat-server/utils"
 	"fmt"
 	"os"
@@ -19,7 +18,7 @@ func main() {
 		panic("Error while loading env file")
 	}
 	// initializing data base
-	database.InitDataBase()
+	// database.InitDataBase()
 
 	app := initAppInstance()
 	accessLogger := utils.RegisterAccessLogger(app)
