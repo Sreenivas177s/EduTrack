@@ -2,26 +2,44 @@ services:
   app-server:
     build: .
     ports:
-      - "3000:3000"
-    # develop:
-    #   watch:
-    #     - action : sync
-    #       path: .
-    #       target: .
+      - "${PORT}:${PORT}"
+    depends_on:
+      master-db-server:
+        condition: service_healthy
+        restart: true
+    develop:
+      watch:
+        - action : sync
+          path: .
+          target: .
+          
   master-db-server:
     image: postgres:latest
     restart: always
+    # hostname: master-database
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PW}
       - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    volumes:
+      - container-base-storage:/var/lib/postgresql/data
+      # - ./schema/init.sql:/docker-entrypoint-initdb.d/init.sql
   pgadmin:
     image: dpage/pgadmin4:latest
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_MAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PW}
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
     ports:
       - "5050:80"
     restart: always
+volumes:
+  container-base-storage: {}
