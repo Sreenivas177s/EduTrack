@@ -1,30 +1,31 @@
 package entity
 
 import (
-	"gorm.io/gorm"
-)
-
-type UserStatus int
-
-const (
-	ACTIVE UserStatus = iota
-	INACTIVE
-	RESIGNED
+	"github.com/gofiber/fiber/v2/log"
 )
 
 type User struct {
-	gorm.Model
-	FirstName    string     `json:"first_name"`
-	LastName     string     `json:"last_name"`
-	EmailId      string     `json:"email_id"`
-	Organization any        `json:"organization"`
-	Status       UserStatus `json:"user_status"`
+	ApiBase
+	FirstName string        `json:"first_name"`
+	LastName  string        `json:"last_name"`
+	EmailId   string        `json:"email_id"`
+	Status    CurrentStatus `json:"user_status"`
 }
 
+// api handler methods
 func (user *User) Validate(httpMethod string) {
 	// httpMethod := params[0]
 
 }
-func (c *User) New() Entity {
-	return Chat{}
+
+// function option methods
+func (user *User) FillDefaults() error {
+	log.Debug("reached method")
+	// user.LastUpdatedTime = time.Now()
+	return nil
+}
+
+func (user *User) RemoveInternalFields() error {
+	log.Debug("reached method")
+	return nil
 }

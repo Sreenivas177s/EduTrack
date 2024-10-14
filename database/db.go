@@ -1,16 +1,12 @@
 package database
 
 import (
-	"fmt"
-	"os"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 )
 
-var dbInstance *gorm.DB
+var dbInstance *sqlx.DB
 
-func GetDBRef() *gorm.DB {
+func GetDBRef() any {
 	if dbInstance == nil {
 		InitDataBase()
 	}
@@ -18,13 +14,6 @@ func GetDBRef() *gorm.DB {
 }
 
 func InitDataBase() {
-	dbParams := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=%s",
-		os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PW"), os.Getenv("POSTGRES_DB"), os.Getenv("POSTGRES_PORT"),
-		os.Getenv("POSTGRES_TIMEZONE"))
-	gormConfig := &gorm.Config{}
-	dbref, err := gorm.Open(postgres.Open(dbParams), gormConfig)
-	if err != nil {
-		panic("Error while obtaining db instance")
-	}
-	dbInstance = dbref
+	// connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PW"), os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_PORT"), os.Getenv("POSTGRES_DB"))
+	// dbInstance = sqlx.MustConnect("pgx", connectionString)
 }

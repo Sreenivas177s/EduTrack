@@ -15,6 +15,10 @@ import (
 func RegisterAccessLogger(app *fiber.App) *os.File {
 	// register accesslog
 	path := fmt.Sprintf("access-log-%s.txt", time.Now().Format(time.DateOnly))
+	err := os.MkdirAll("logs", os.ModePerm)
+	if err != nil {
+		log.Fatalf("error while creating logs directory")
+	}
 	path = filepath.Join("logs", path)
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
