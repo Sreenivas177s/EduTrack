@@ -21,7 +21,7 @@ func HandleAuth(app fiber.Router) {
 
 	app.Post("/login", authorizeLogin)
 
-	app.Post("/signup")
+	app.Post("/signup", signUpUser)
 
 	// app.Post("/logout")
 }
@@ -54,6 +54,7 @@ func authorizeLogin(ctx *fiber.Ctx) error {
 		ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 	ctx.Status(fiber.StatusAccepted)
+	ctx.Redirect("//index.html")
 	if os.Getenv("USE_COOKIE_AUTH") == "true" {
 		cookieData := &fiber.Cookie{
 			Name:  typeAuthorization,
