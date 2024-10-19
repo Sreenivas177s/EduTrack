@@ -1,9 +1,12 @@
 #folders
 logs*
-
+tmp
 # files
 go.sum
 .env
 *.exe*
 todo.txt
 *.toml
+
+# specific files
+generated-routes.json
