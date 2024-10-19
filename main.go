@@ -38,6 +38,9 @@ func main() {
 
 	// return not found
 	app.All("/*", utils.ServeNotFoundHTML)
+	//print all registered routes in configured-routes.json
+	utils.GenerateConfiguredRoutesJSON(app)
+
 	defer accessLogger.Close()
 	url := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
 	log.Fatal(app.Listen(url))

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"chat-server/api-framework/entity"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -36,7 +37,7 @@ func ServeNotFoundHTML(ctx *fiber.Ctx) error {
 	ctx.Status(fiber.StatusNotFound)
 	return ctx.SendFile(path)
 }
-func ConstructResponse(status int, message string, responseData entity.Entity) fiber.Map {
+func ConstructResponse(status int, message string, responseData entity.ApiEntity) fiber.Map {
 	response := fiber.Map{
 		"status": status,
 	}
@@ -47,4 +48,39 @@ func ConstructResponse(status int, message string, responseData entity.Entity) f
 		response["data"] = responseData
 	}
 	return response
+}
+func WriteFileAtomic(fileName string, data []byte) error {
+	tmpName := fmt.Sprintf("%s.tmp", fileName)
+	fp, err := os.CreateTemp(".", tmpName)
+	// fp, err := os.OpenFile(tmp, os.O_WRONLY|os.O_CREATE|os.O_SYNC, 0664)
+	if err != nil {
+		return err
+	}
+	tmpName = fp.Name()
+	_, err = fp.Write(data)
+	if err != nil {
+		// os.Remove(tmpName)
+		return err
+	}
+	err = fp.Sync()
+	if err != nil {
+		return err
+	}
+	fp.Close()
+	defer func() {
+		if err != nil {
+			fp.Close()
+			os.Remove(tmpName)
+		}
+	}()
+	return os.Rename(tmpName, fileName)
+}
+
+func GenerateConfiguredRoutesJSON(app *fiber.App) {
+	data, _ := json.MarshalIndent(app.GetRoutes(true), "", "  ")
+	err := WriteFileAtomic("generated-routes.json", data)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	log.Info("Routes file generated ", time.Now().Format(time.DateTime), "...")
 }
