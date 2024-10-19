@@ -21,7 +21,7 @@ func HandleAuth(app fiber.Router) {
 
 	app.Post("/login", authorizeLogin)
 
-	app.Post("/signup", signUpUser)
+	// app.Post("/signup", signUpUser)
 
 	// app.Post("/logout")
 }
@@ -32,7 +32,7 @@ func signUpUser(ctx *fiber.Ctx) error {
 }
 
 func authorizeLogin(ctx *fiber.Ctx) error {
-	userIdentifier := ctx.FormValue("userIdentifier")
+	userIdentifier := ctx.FormValue("userEmail")
 	userPass := ctx.FormValue("userPassword")
 
 	user, err := AuthorizeUser(userIdentifier, userPass)
@@ -67,6 +67,9 @@ func authorizeLogin(ctx *fiber.Ctx) error {
 }
 
 func InitAuthMiddleWare(app fiber.Router) fiber.Router {
+	if os.Getenv("DISABLE_AUTH") == "true" {
+		return app
+	}
 	authType := "header"
 	if os.Getenv("USE_COOKIE_AUTH") == "true" {
 		authType = "cookie"
