@@ -14,7 +14,7 @@ services:
           target: .
           
   master-db-server:
-    image: postgres:latest
+    image: postgres:17
     restart: always
     # hostname: master-database
     environment:
@@ -39,7 +39,7 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PW}
       - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
     ports:
-      - "5050:80"
+      - "${PGADMIN_PORT}:80"
     restart: always
 volumes:
   container-base-storage: {}
