@@ -37,7 +37,7 @@ func ServeNotFoundHTML(ctx *fiber.Ctx) error {
 	ctx.Status(fiber.StatusNotFound)
 	return ctx.SendFile(path)
 }
-func ConstructResponse(status int, message string, responseData entity.ApiEntity) fiber.Map {
+func ConstructResponse(status int, message string, entity string, responseData entity.ApiEntity) fiber.Map {
 	response := fiber.Map{
 		"status": status,
 	}
@@ -46,6 +46,9 @@ func ConstructResponse(status int, message string, responseData entity.ApiEntity
 	}
 	if responseData != nil {
 		response["data"] = responseData
+	}
+	if entity != "" {
+		response["entity"] = entity
 	}
 	return response
 }

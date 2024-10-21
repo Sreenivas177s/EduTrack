@@ -16,3 +16,8 @@ type Entity interface {
 	FillDefaults() error
 	RemoveInternalFields() error
 }
+
+type ApiEntity interface {
+	Authorize(httpMethod string) (bool, error)
+	ID() uint
+}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gofiber/fiber/v2/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -27,6 +28,7 @@ func InitDataBase() {
 	if err != nil {
 		panic("Error while obtaining db instance")
 	}
+	log.Info("Connected to Database")
 	dbInstance = dbref
 
 	// migrate tables
@@ -36,7 +38,12 @@ func InitDataBase() {
 }
 
 func handleTableMigration(db *gorm.DB) {
-	err := db.AutoMigrate(&entity.User{})
+	panicOnError(db.AutoMigrate(&entity.User{}))
+	// panicOnError(db.AutoMigrate(&entity.Institution{}))
+	// panicOnError(db.AutoMigrate(&entity.Campus{}))
+
+}
+func panicOnError(err error) {
 	if err != nil {
 		panic(err.Error())
 	}

@@ -31,13 +31,14 @@ func main() {
 	// authorizing apis
 	authRouter := app.Group(`/auth`)
 	auth.HandleAuth(authRouter)
-	authenticatedRouter := auth.InitAuthMiddleWare(app.Group("/*"))
 	// execute apis
-	apiframework.HandleApiCall(authenticatedRouter.Group(`/api/:version<regex(v\d{1,2})>`))
+	apiRouter := app.Group("/api")
+	authenticatedApiRouter := auth.InitAuthMiddleWare(apiRouter)
+	apiframework.HandleApiCall(authenticatedApiRouter.Group(`/:version<regex(v\d{1,2})>`))
 	// ws := app.Group("/ws/v1")
 
 	// return not found
-	app.All("/*", utils.ServeNotFoundHTML)
+	app.All("/*", utils.ServeNotFoundHTML).Name("Not found - Generic")
 	//print all registered routes in configured-routes.json
 	utils.GenerateConfiguredRoutesJSON(app)
 

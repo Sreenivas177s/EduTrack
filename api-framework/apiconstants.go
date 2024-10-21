@@ -18,9 +18,10 @@ func UrlNotFound(ctx *fiber.Ctx) error {
 	return ctx.JSON(utils.NOT_FOUND_JSON)
 }
 
-func ExecuteEntityMethod(value reflect.Value, methodName string, params []reflect.Value) {
+func ExecuteEntityMethod(value reflect.Value, methodName string, params []reflect.Value) []reflect.Value {
 	preProcessor := value.MethodByName(methodName)
 	if preProcessor.IsValid() {
-		preProcessor.Call(params)
+		return preProcessor.Call(params)
 	}
+	return nil
 }
