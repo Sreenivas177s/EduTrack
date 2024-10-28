@@ -7,7 +7,6 @@ import (
 	"reflect"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
 )
 
 func HandleApiCall(app fiber.Router) {
@@ -20,10 +19,7 @@ func HandleApiCall(app fiber.Router) {
 	entityApi.Post(``, ParseEntityEvent, handlePOST).Name("Add Entity")
 
 	// GET HANDLER
-	entityApi.Get(`/:entityid<regex(\d{1,19})>?`, func(ctx *fiber.Ctx) error {
-		log.Debug(ctx.Locals(utils.EntityEventData))
-		return ctx.Next()
-	}).Name("Entity Get")
+	entityApi.Get(`/:entityid<regex(\d{1,19})>?`, ParseEntityEvent, handleGET).Name("Entity Get")
 
 	// // PUT HANDLER
 	// app.Put(`/:entity/:entityid`)
@@ -49,15 +45,12 @@ func handlePOST(ctx *fiber.Ctx) error {
 
 	methodParams := []reflect.Value{reflect.ValueOf(ctx.Method())}
 	//check for user authorization
-	authorizationResult := ExecuteEntityMethod(inputValueAllocatedPointer, entity.METHOD_AUTHORIZER, methodParams)
-	if !authorizationResult[0].Bool() || authorizationResult[1].Interface() != nil {
-		return fiber.NewError(fiber.StatusUnauthorized)
+	if err := Authorize(inputValueAllocatedPointer, methodParams); err != nil {
+		return err
 	}
-	// validate input data
-	ExecuteEntityMethod(inputValueAllocatedPointer, entity.METHOD_VALIDATOR, methodParams)
-
-	// pre persistence handling
-	ExecuteEntityMethod(inputValueAllocatedPointer, entity.METHOD_PRE_PROCESSOR, methodParams)
+	if err := Validate(inputValueAllocatedPointer, inputType, methodParams); err != nil {
+		return err
+	}
 
 	// add the provided data into persistence layer
 	dbReference := database.GetDBRef()
@@ -66,6 +59,8 @@ func handlePOST(ctx *fiber.Ctx) error {
 		txn.Rollback()
 		return fiber.NewError(fiber.StatusBadRequest)
 	}
+	// pre persistence handling
+	ExecuteEntityMethod(inputValueAllocatedPointer, utils.METHOD_PRE_PROCESSOR, methodParams)
 	if err := txn.Commit().Error; err != nil {
 		txn.Rollback()
 		return fiber.NewError(fiber.StatusBadRequest)
@@ -77,9 +72,32 @@ func handlePOST(ctx *fiber.Ctx) error {
 	dbReference.Take(&refetchedData, insertedID)
 
 	//post persistence handling
-	ExecuteEntityMethod(inputValueAllocatedPointer, entity.METHOD_POST_PROCESSOR, methodParams)
+	ExecuteEntityMethod(inputValueAllocatedPointer, utils.METHOD_POST_PROCESSOR, methodParams)
 
 	response := utils.ConstructResponse(fiber.StatusCreated, "Created successfully", event.entityName, refetchedData)
 	ctx.Status(fiber.StatusCreated)
 	return ctx.JSON(response)
+}
+
+func handleGET(ctx *fiber.Ctx) error {
+	event := getEntityEvent(ctx)
+	if event == nil {
+		return fiber.NewError(fiber.StatusInternalServerError)
+	}
+	entityType := event.structType
+	fetchedData := reflect.New(entityType)
+	castedValue := fetchedData.Interface()
+	entityID := event.entityid
+
+	db := database.GetDBRef()
+	result := db.First(&castedValue, entityID)
+	if result.Error != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, result.Error.Error())
+	}
+
+	methodParams := []reflect.Value{reflect.ValueOf(ctx.Method())}
+	if err := Authorize(fetchedData, methodParams); err != nil {
+		return err
+	}
+	return ctx.JSON(castedValue)
 }

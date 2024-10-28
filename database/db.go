@@ -2,6 +2,7 @@ package database
 
 import (
 	"chat-server/api-framework/entity"
+	entitysubtables "chat-server/api-framework/entity-sub-tables"
 	"fmt"
 	"os"
 
@@ -38,7 +39,10 @@ func InitDataBase() {
 }
 
 func handleTableMigration(db *gorm.DB) {
+	//user tables
 	panicOnError(db.AutoMigrate(&entity.User{}))
+	panicOnError(db.AutoMigrate(&entitysubtables.UserAuthDetails{}))
+
 	// panicOnError(db.AutoMigrate(&entity.Institution{}))
 	// panicOnError(db.AutoMigrate(&entity.Campus{}))
 

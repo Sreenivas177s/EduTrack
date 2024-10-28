@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"chat-server/api-framework/entity"
 	"chat-server/database"
 	"fmt"
 	"os"
@@ -89,14 +90,18 @@ func InitAuthMiddleWare(app fiber.Router) fiber.Router {
 }
 
 func authSuccessHandler(ctx *fiber.Ctx) error {
-	user := ctx.Locals(TOKEN_USER).(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
+	jwtUser := ctx.Locals(TOKEN_USER).(*jwt.Token)
+	claims := jwtUser.Claims.(jwt.MapClaims)
 	// parse user details and fetch user
 	emailid := claims["email"].(string)
 	name := claims["name"].(string)
 	log.Debugf("user : %s email : %s", name, emailid)
-	//fetch user and set context
-	loggedInUser := database.GetUser(emailid)
-	ctx.Locals(LOGGEDIN_USER, loggedInUser)
+	// fetch user and set context
+	user := new(entity.User)
+	result := database.GetDBRef().Where("email_id = ?", emailid).Find(&user)
+	if result.Error != nil {
+		return fiber.NewError(fiber.StatusUnauthorized)
+	}
+	ctx.Locals(LOGGEDIN_USER, user)
 	return ctx.Next()
 }

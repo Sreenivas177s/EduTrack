@@ -5,6 +5,7 @@ import (
 	"reflect"
 )
 
+// api url to entity struct mapping
 var entityMapping map[string]reflect.Type = map[string]reflect.Type{
 	"users":        reflect.TypeOf(entity.User{}),
 	"institutions": reflect.TypeOf(entity.Institution{}),

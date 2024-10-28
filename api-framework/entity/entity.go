@@ -19,5 +19,6 @@ type Entity interface {
 
 type ApiEntity interface {
 	Authorize(httpMethod string) (bool, error)
+	Validate(httpNethod string) error
 	ID() uint
 }
