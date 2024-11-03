@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"chat-server/api-framework/entity"
+	"chat-server/api/entity"
 	"chat-server/database"
 	"fmt"
 	"os"
@@ -15,7 +15,6 @@ import (
 
 const TOKEN_USER = "token_user"
 const LOGGEDIN_USER = "loggedin_user"
-const typeAuthorization = "Authorization"
 
 func HandleAuth(app fiber.Router) {
 	// auth related apis
@@ -43,10 +42,8 @@ func authorizeLogin(ctx *fiber.Ctx) error {
 
 	// if authorized generate JWT creds and send as asresponse
 	jwtClaims := jwt.MapClaims{
-		"name":  user.FirstName,
-		"email": user.EmailId,
-		"admin": true,
-		"exp":   time.Now().Add(time.Hour * 72).Unix(),
+		"user_id": user.ID(),
+		"exp":     time.Now().Add(time.Hour * 72).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
 	//sign token and send with cookie
@@ -55,10 +52,9 @@ func authorizeLogin(ctx *fiber.Ctx) error {
 		ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 	ctx.Status(fiber.StatusAccepted)
-	ctx.Redirect("//index.html")
 	if os.Getenv("USE_COOKIE_AUTH") == "true" {
 		cookieData := &fiber.Cookie{
-			Name:  typeAuthorization,
+			Name:  fiber.HeaderAuthorization,
 			Value: signedToken,
 		}
 		ctx.Cookie(cookieData)
@@ -68,13 +64,6 @@ func authorizeLogin(ctx *fiber.Ctx) error {
 }
 
 func InitAuthMiddleWare(app fiber.Router) fiber.Router {
-	if os.Getenv("DISABLE_AUTH") == "true" {
-		return app
-	}
-	authType := "header"
-	if os.Getenv("USE_COOKIE_AUTH") == "true" {
-		authType = "cookie"
-	}
 	config := jwtware.Config{
 		SigningKey: jwtware.SigningKey{
 			JWTAlg: jwtware.HS256,
@@ -82,7 +71,10 @@ func InitAuthMiddleWare(app fiber.Router) fiber.Router {
 		},
 		SuccessHandler: authSuccessHandler,
 		ContextKey:     TOKEN_USER,
-		TokenLookup:    fmt.Sprintf("%s:%s", authType, typeAuthorization),
+	}
+
+	if os.Getenv("USE_COOKIE_AUTH") == "true" {
+		config.TokenLookup = fmt.Sprintf("%s:%s", "cookie", fiber.HeaderAuthorization)
 	}
 	app.Use(jwtware.New(config))
 
@@ -93,12 +85,11 @@ func authSuccessHandler(ctx *fiber.Ctx) error {
 	jwtUser := ctx.Locals(TOKEN_USER).(*jwt.Token)
 	claims := jwtUser.Claims.(jwt.MapClaims)
 	// parse user details and fetch user
-	emailid := claims["email"].(string)
-	name := claims["name"].(string)
-	log.Debugf("user : %s email : %s", name, emailid)
+	userID := uint(claims["user_id"].(float64))
+	log.Debugf("user id = %s", userID)
 	// fetch user and set context
 	user := new(entity.User)
-	result := database.GetDBRef().Where("email_id = ?", emailid).Find(&user)
+	result := database.GetDBRef().First(&user, userID)
 	if result.Error != nil {
 		return fiber.NewError(fiber.StatusUnauthorized)
 	}

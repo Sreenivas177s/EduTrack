@@ -1,7 +1,7 @@
 package api
 
 import (
-	"chat-server/api-framework/entity"
+	"chat-server/api/entity"
 	"chat-server/database"
 	"chat-server/utils"
 	"reflect"
@@ -16,7 +16,7 @@ func HandleApiCall(app fiber.Router) {
 	app.Use(EnforceHeaders)
 	entityApi := app.Group("/:entity")
 	// POST HANDLER
-	entityApi.Post(``, ParseEntityEvent, handlePOST).Name("Add Entity")
+	entityApi.Post(``, ParseEntityEvent, handlePOST).Name("Entity Add")
 
 	// GET HANDLER
 	entityApi.Get(`/:entityid<regex(\d{1,19})>?`, ParseEntityEvent, handleGET).Name("Entity Get")
@@ -55,12 +55,12 @@ func handlePOST(ctx *fiber.Ctx) error {
 	// add the provided data into persistence layer
 	dbReference := database.GetDBRef()
 	txn := dbReference.Begin()
+	// pre persistence handling
+	ExecuteEntityMethod(inputValueAllocatedPointer, utils.METHOD_PRE_PROCESSOR, methodParams)
 	if err := txn.Create(inputData).Error; err != nil {
 		txn.Rollback()
 		return fiber.NewError(fiber.StatusBadRequest)
 	}
-	// pre persistence handling
-	ExecuteEntityMethod(inputValueAllocatedPointer, utils.METHOD_PRE_PROCESSOR, methodParams)
 	if err := txn.Commit().Error; err != nil {
 		txn.Rollback()
 		return fiber.NewError(fiber.StatusBadRequest)

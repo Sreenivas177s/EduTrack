@@ -1,7 +1,7 @@
 package validator
 
 import (
-	"chat-server/api-framework/entity"
+	"chat-server/api/entity"
 	"errors"
 	"fmt"
 	"reflect"

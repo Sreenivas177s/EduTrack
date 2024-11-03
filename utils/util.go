@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"chat-server/api-framework/entity"
+	"chat-server/api/entity"
 	"encoding/json"
 	"fmt"
 	"os"

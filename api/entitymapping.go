@@ -1,7 +1,7 @@
 package api
 
 import (
-	"chat-server/api-framework/entity"
+	"chat-server/api/entity"
 	"reflect"
 )
 

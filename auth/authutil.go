@@ -1,18 +1,29 @@
 package auth
 
 import (
-	"chat-server/api-framework/entity"
+	"chat-server/api/entity"
+	"chat-server/database"
 	"crypto"
 	"errors"
 	"os"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func AuthorizeUser(identifier, password string) (*entity.User, error) {
 	if identifier != "" && password != "" {
-		return &entity.User{
-			EmailId:   identifier,
-			FirstName: identifier,
-		}, nil
+		user := entity.User{
+			EmailId: identifier,
+		}
+		dbref := database.GetDBRef()
+		result := dbref.Where(&user).First(&user)
+		if result.RowsAffected == 1 {
+			salted := append([]byte(password), user.Salt...)
+			if err := bcrypt.CompareHashAndPassword(user.HashedPassword, salted); err != nil {
+				return nil, errors.New("invalid username/password")
+			}
+			return &user, nil
+		}
 	}
 	return nil, errors.New("unable to Find user")
 }

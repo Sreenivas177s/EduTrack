@@ -1,7 +1,7 @@
 package main
 
 import (
-	apiframework "chat-server/api-framework"
+	api "chat-server/api"
 	"chat-server/auth"
 	"chat-server/database"
 	"chat-server/utils"
@@ -34,7 +34,7 @@ func main() {
 	// execute apis
 	apiRouter := app.Group("/api")
 	authenticatedApiRouter := auth.InitAuthMiddleWare(apiRouter)
-	apiframework.HandleApiCall(authenticatedApiRouter.Group(`/:version<regex(v\d{1,2})>`))
+	api.HandleApiCall(authenticatedApiRouter.Group(`/:version<regex(v\d{1,2})>`))
 	// ws := app.Group("/ws/v1")
 
 	// return not found

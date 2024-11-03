@@ -1,7 +1,7 @@
 package api
 
 import (
-	"chat-server/api-framework/validator"
+	"chat-server/api/validator"
 	"chat-server/utils"
 	"reflect"
 

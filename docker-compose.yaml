@@ -1,6 +1,8 @@
 services:
   app-server:
-    build: .
+    build: 
+      dockerfile: Dockerfile
+    image: result/latest
     ports:
       - "${PORT}:${PORT}"
     depends_on:
@@ -39,8 +41,8 @@ services:
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_MAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PW}
-      - PGADMIN_CONFIG_SERVER_MODE=False
-      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=${PGADMIN_CONFIGURE_SERVER}
+      - PGADMIN_CONFIG_SERVER_MODE=${PGADMIN_CONFIGURE_SERVER}
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=${PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED}
     ports:
       - "${PGADMIN_PORT}:80"
     restart: always
