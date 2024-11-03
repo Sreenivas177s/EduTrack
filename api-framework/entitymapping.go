@@ -1,4 +1,4 @@
-package apiframework
+package api
 
 import (
 	"chat-server/api-framework/entity"
