@@ -1,0 +1,14 @@
+{
+    "Servers": {
+        "1": {
+            "Group": "Servers",
+            "Name": "Master Database",
+            "Host": "master-db-server",
+            "Port": 5432,
+            "MaintenanceDB": "postgres",
+            "Username": "db_master",
+            "Password": "edu_db_master_pw",
+            "Favorite": true
+        }
+    }
+}

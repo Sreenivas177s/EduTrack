@@ -30,16 +30,21 @@ services:
       start_period: 30s
       timeout: 10s
     volumes:
-      - container-base-storage:/var/lib/postgresql/data
-      # - ./schema/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - container-base-storage:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4
+    depends_on:
+      - master-db-server
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_MAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PW}
-      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=${PGADMIN_CONFIGURE_SERVER}
     ports:
       - "${PGADMIN_PORT}:80"
     restart: always
+    volumes:
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json
 volumes:
   container-base-storage: {}
