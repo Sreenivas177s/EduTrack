@@ -9,6 +9,9 @@ services:
       master-db-server:
         condition: service_healthy
         restart: true
+      redis-server:
+        condition: service_healthy
+        restart: true
     develop:
       watch:
         - action : sync
@@ -34,6 +37,18 @@ services:
     volumes:
       # - container-base-storage:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+  redis-server:
+    image: redis:latest
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    depends_on:
+      - master-db-server
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
   pgadmin:
     image: dpage/pgadmin4
     depends_on:

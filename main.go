@@ -23,18 +23,18 @@ func main() {
 	}
 	// initializing data base
 	database.InitDataBase()
+	database.InitializeRedis()
 
 	app := initAppInstance()
 
 	// init logger
 	accessLogger := utils.RegisterAccessLogger(app)
+
+	authMiddleware := auth.GetAuthMiddleWare()
+	app.Use(authMiddleware)
 	// authorizing apis
-	authRouter := app.Group(`/auth`)
-	auth.HandleAuth(authRouter)
-	// execute apis
-	apiRouter := app.Group("/api")
-	authenticatedApiRouter := auth.InitAuthMiddleWare(apiRouter)
-	api.HandleApiCall(authenticatedApiRouter.Group(`/:version<regex(v\d{1,2})>`))
+	auth.HandleAuth(app)
+	api.HandleApiCall(app)
 	// ws := app.Group("/ws/v1")
 
 	// return not found

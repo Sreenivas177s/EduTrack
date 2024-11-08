@@ -39,14 +39,14 @@ func InitDataBase() {
 
 func handleTableMigration(db *gorm.DB) {
 	//user tables
-	panicOnError(db.AutoMigrate(&entity.User{}))
-
-	// panicOnError(db.AutoMigrate(&entity.Institution{}))
+	MigrateStruct(&entity.User{})
+	// panicOnError(db.-(&entity.Institution{}))
 	// panicOnError(db.AutoMigrate(&entity.Campus{}))
 
 }
-func panicOnError(err error) {
-	if err != nil {
+func MigrateStruct(structs ...interface{}) {
+	db := GetDBRef()
+	if err := db.AutoMigrate(structs...); err != nil {
 		panic(err.Error())
 	}
 }

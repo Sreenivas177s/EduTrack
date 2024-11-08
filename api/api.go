@@ -9,12 +9,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func HandleApiCall(app fiber.Router) {
+func HandleApiCall(app *fiber.App) {
+	apiRouter := app.Group("/api")
 	// route will start as '/api/version'
 
 	//handler needs to know all params before parsing them so calling parse event method for every configured url
-	app.Use(EnforceHeaders)
-	entityApi := app.Group("/:entity")
+	apiRouter.Use(EnforceHeaders)
+
+	entityApi := apiRouter.Group("/:entity")
 	// POST HANDLER
 	entityApi.Post(``, ParseEntityEvent, handlePOST).Name("Entity Add")
 
