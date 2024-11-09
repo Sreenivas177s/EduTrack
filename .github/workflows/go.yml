@@ -16,8 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Change directory
-      run: cd ./server
 
     - name: Set up Go
       uses: actions/setup-go@v4
@@ -27,9 +25,12 @@ jobs:
         
     - name: Install dependencies
       run: go get ./...
+      working-directory: ./server
       
     - name: Build
       run: go build -v ./...
+      working-directory: ./server
 
     - name: Test
       run: go test -v ./...
+      working-directory: ./server
