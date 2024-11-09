@@ -16,6 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Change directory
+      run: cd ./server
+
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
@@ -23,10 +26,10 @@ jobs:
         cache-dependency-path: subdir/go.sum
         
     - name: Install dependencies
-      run: go get ./server/...
+      run: go get ./...
       
     - name: Build
-      run: go build -v ./server/...
+      run: go build -v ./...
 
     - name: Test
-      run: go test -v ./server/...
+      run: go test -v ./...
