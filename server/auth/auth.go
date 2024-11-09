@@ -32,7 +32,7 @@ func signUpUser(ctx *fiber.Ctx) error {
 func handleLogout(ctx *fiber.Ctx) error {
 	jwtUser := ctx.Locals(TOKEN_USER).(*jwt.Token)
 	database.SetBlacklistToken(jwtUser.Raw, fmt.Sprintf("%v", jwtUser.Claims.(jwt.MapClaims)["sub"]))
-	ctx.ClearCookie()
+	ctx.ClearCookie(fiber.HeaderAuthorization)
 	return ctx.SendStatus(fiber.StatusOK)
 }
 func authorizeLogin(ctx *fiber.Ctx) error {
@@ -98,7 +98,7 @@ func authSuccessHandler(ctx *fiber.Ctx) error {
 	// check if token is blacklisted
 	isBlacklisted, err := database.IsBlacklistToken(jwtUser.Raw)
 	if err != nil || isBlacklisted {
-		ctx.ClearCookie()
+		ctx.ClearCookie(fiber.HeaderAuthorization)
 		return ctx.SendStatus(fiber.StatusUnauthorized)
 	}
 	// parse user details and fetch user

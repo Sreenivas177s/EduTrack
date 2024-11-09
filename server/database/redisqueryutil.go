@@ -6,7 +6,7 @@ import (
 )
 
 func SetBlacklistToken(token string, userID string) error {
-	return rdb.Set(ctx, fmt.Sprintf("blacklist_token:%s", token), userID, time.Hour*1).Err()
+	return rdb.Set(ctx, fmt.Sprintf("blacklist_token:%s", token), userID, time.Hour).Err()
 }
 
 func IsBlacklistToken(token string) (bool, error) {
