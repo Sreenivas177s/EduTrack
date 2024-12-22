@@ -1,0 +1,27 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "hello"
+msgstr "Hello"
+
+msgid "welcome"
+msgstr "Welcome"
+
+msgid "goodbye"
+msgstr "Goodbye"
+
+msgid "edutrack"
+msgid "EduTrack"
+
+msgid "Created successfully"
+msgstr "Created successfully"
+
+msgid "Not Found - API"
+msgstr "Not Found - API"
+
+msgid "Internal Server Error"
+msgstr "Internal Server Error"
+
+msgid "Bad Request"
+msgstr "Bad Request"

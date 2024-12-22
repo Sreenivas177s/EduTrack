@@ -10,7 +10,7 @@ import (
 )
 
 func HandleApiCall(app *fiber.App) {
-	apiRouter := app.Group("/api")
+	apiRouter := app.Group("/api/:version")
 	// route will start as '/api/version'
 
 	//handler needs to know all params before parsing them so calling parse event method for every configured url

@@ -36,8 +36,14 @@ func handleLogout(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 func authorizeLogin(ctx *fiber.Ctx) error {
-	userIdentifier := ctx.FormValue("userEmail")
-	userPass := ctx.FormValue("userPassword")
+
+	form := new(LoginForm)
+	if err := ctx.BodyParser(form); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+
+	userIdentifier := form.Email_id
+	userPass := form.Password
 
 	user, err := AuthorizeUser(userIdentifier, userPass)
 	if err != nil {
@@ -118,7 +124,7 @@ func authErrorHandler(ctx *fiber.Ctx, err error) error {
 }
 
 func authFilter(ctx *fiber.Ctx) bool {
-	if ctx.Path() == "/auth/login" || ctx.Path() == "/auth/signup" {
+	if ctx.Path() == "/auth/login" || ctx.Path() == "/auth/signup" || ctx.Path() == "/auth/logout" || (os.Getenv("DEBUG_MODE") == "true" && ctx.Path() == "/api/v1/users" && ctx.Method() == fiber.MethodPost) {
 		return true
 	}
 	return false

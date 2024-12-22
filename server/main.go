@@ -7,6 +7,7 @@ import (
 	"chat-server/utils"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +19,7 @@ import (
 
 func main() {
 	// load env variables
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load(filepath.Join("..", ".env")); err != nil {
 		panic("Error while loading env file")
 	}
 	// initializing data base

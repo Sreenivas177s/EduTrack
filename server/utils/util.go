@@ -26,7 +26,7 @@ func RegisterAccessLogger(app *fiber.App) *os.File {
 		log.Fatalf("error opening file: %v", err)
 	}
 	config := logger.Config{
-		Format: "${time} - ${method} | ${path} | ${status} | ${latency} | ${ip} | ${error}\n",
+		Format: "${time} - ${method} | ${path} | ${status} | ${latency} | ${ip} | ${error} | ${body}\n",
 		Output: file,
 	}
 	app.Use(logger.New(config))

@@ -8,6 +8,11 @@ import (
 	"os"
 )
 
+type LoginForm struct {
+	Email_id string `json:"email_id"`
+	Password string `json:"password"`
+}
+
 func AuthorizeUser(identifier, password string) (*entity.User, error) {
 	if identifier != "" && password != "" {
 		user, err := database.GetUserByEmail(identifier)
