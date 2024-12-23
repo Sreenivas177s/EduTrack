@@ -1,5 +1,6 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
+import { cookies } from "next/headers";
  
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -9,32 +10,43 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {},
       },
       authorize: async (credentials) => {
-        let user = null
         try {
-          const response = await fetch("http://localhost:3001/auth/login", {
-            method: "POST",
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(credentials)
-          });
-          console.log(response)
+          const response = await loginUser(credentials)
           if (response.status === 200) {
-            const data = await response.json();
-            user = data;
+            const data = await response.json()
+            console.log(data)
+            const cookie = await cookies()
+            cookie.set("Authorization", data.accessToken,{
+              httpOnly: true,
+              expires: data.expiresAt,
+              sameSite: "strict",
+              path: "/",
+            })
+            const userResponse = await fetch('http://localhost:3001/api/v1/users/me')
+            const userData = await userResponse.json()
+            console.log(userData)
+            const user = userData["data"];
+            return user
+          } else {
+            return null
           }
-          if (!user) {
-            // No user found, so this is their first attempt to login
-            // Optionally, this is also the place you could do a user registration
-            return null;
-          }
-          
-          // return user object with their profile data
-          return user
-        } catch (_) {
+        } catch (error) {
+          console.log(error.message)
           return null
         }
       },
     }),
   ],
 })
+
+async function loginUser(credentials : Partial<Record<"email_id" | "password", unknown>>) {
+  const response = await fetch("http://localhost:3001/auth/login", {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json',
+      origin: 'nextjs-client',
+    },
+    body: JSON.stringify(credentials)
+  });
+  return response;
+}

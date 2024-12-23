@@ -17,6 +17,10 @@ func HandleApiCall(app *fiber.App) {
 	apiRouter.Use(EnforceHeaders)
 
 	entityApi := apiRouter.Group("/:entity")
+	//custom operation handler
+	entityApi.All(`/:custom_operation<regex(_[a-z_]+)>`, ParseEntityEvent, handleCustomOperation).Name("Entity custom operation")
+	entityApi.All(`/:entityid<regex(\d{1,19})>/:custom_operation<regex(_[a-z_]+)>`, ParseEntityEvent, handleCustomOperation).Name("Entity instance custom operation")
+
 	// POST HANDLER
 	entityApi.Post(``, ParseEntityEvent, handlePOST).Name("Entity Add")
 
@@ -102,4 +106,18 @@ func handleGET(ctx *fiber.Ctx) error {
 		return err
 	}
 	return ctx.JSON(castedValue)
+}
+
+func handleCustomOperation(ctx *fiber.Ctx) error {
+	event := getEntityEvent(ctx)
+	if event == nil {
+		return fiber.NewError(fiber.StatusInternalServerError)
+	}
+	entityType := event.structType
+	fetchedData := reflect.New(entityType)
+
+	if err := Authorize(fetchedData); err != nil {
+		return err
+	}
+	return ctx.Next()
 }

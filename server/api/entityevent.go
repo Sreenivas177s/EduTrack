@@ -9,21 +9,23 @@ import (
 )
 
 type EntityEvent struct {
-	method     string
-	entityid   int64
-	entityName string
-	apiversion string
-	structType reflect.Type
+	method          string
+	entityid        int64
+	entityName      string
+	apiversion      string
+	structType      reflect.Type
+	customOperation string
 }
 
 func ParseEntityEvent(ctx *fiber.Ctx) error {
 	var (
-		entityid   int64
-		err        error
-		tempId     = ctx.Params("entityid")
-		entityName = ctx.Params("entity")
-		structType = GetDefinedType(entityName)
-		event      *EntityEvent
+		entityid         int64
+		err              error
+		tempId           = ctx.Params("entityid")
+		entityName       = ctx.Params("entity")
+		custom_operation = ctx.Params("custom_operation")
+		structType       = GetDefinedType(entityName)
+		event            *EntityEvent
 	)
 
 	if tempId != "" {
@@ -37,11 +39,12 @@ func ParseEntityEvent(ctx *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound)
 	}
 	event = &EntityEvent{
-		method:     ctx.Method(),
-		entityName: entityName,
-		entityid:   entityid,
-		apiversion: ctx.Params("version"),
-		structType: structType,
+		method:          ctx.Method(),
+		entityName:      entityName,
+		entityid:        entityid,
+		apiversion:      ctx.Params("version"),
+		structType:      structType,
+		customOperation: custom_operation,
 	}
 	ctx.Locals(utils.EntityEventData, event)
 	return ctx.Next()

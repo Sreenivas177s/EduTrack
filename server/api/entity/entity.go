@@ -19,4 +19,5 @@ type ApiEntity interface {
 	Validate(httpMethod string) error
 	ID() uint
 	Preprocessor(httpMethod string) error
+	HandleOperation(operation string) error
 }

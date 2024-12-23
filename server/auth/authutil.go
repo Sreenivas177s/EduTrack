@@ -9,8 +9,10 @@ import (
 )
 
 type LoginForm struct {
-	Email_id string `json:"email_id"`
-	Password string `json:"password"`
+	Email_id    string `json:"email_id"`
+	Password    string `json:"password"`
+	CallbackUrl string `json:"callback_url"`
+	Source      string `json:"source"`
 }
 
 func AuthorizeUser(identifier, password string) (*entity.User, error) {

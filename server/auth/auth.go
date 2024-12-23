@@ -64,7 +64,8 @@ func authorizeLogin(ctx *fiber.Ctx) error {
 		log.Errorf("Error signing token: %v", err)
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
-	if os.Getenv("USE_COOKIE_AUTH") == "true" {
+	fromClientServer := ctx.Get("Origin")
+	if os.Getenv("USE_COOKIE_AUTH") == "true" && fromClientServer != "nextjs-client" {
 		cookieData := &fiber.Cookie{
 			Name:     fiber.HeaderAuthorization,
 			Value:    signedToken,
@@ -76,8 +77,12 @@ func authorizeLogin(ctx *fiber.Ctx) error {
 		ctx.Cookie(cookieData)
 		return ctx.SendStatus(fiber.StatusOK)
 	}
+	responseToken := fiber.Map{
+		"accessToken": signedToken,
+		"expiresAt":   currentTime.Add(time.Hour).Unix(),
+	}
 	ctx.Status(fiber.StatusOK)
-	return ctx.JSON(fiber.Map{"token": signedToken})
+	return ctx.JSON(responseToken)
 }
 
 func GetAuthMiddleWare() fiber.Handler {

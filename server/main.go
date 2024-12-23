@@ -19,7 +19,7 @@ import (
 
 func main() {
 	// load env variables
-	if err := godotenv.Load(filepath.Join("..", ".env")); err != nil {
+	if err := godotenv.Load(filepath.Join("..", ".env.local")); err != nil {
 		panic("Error while loading env file")
 	}
 	// initializing data base
