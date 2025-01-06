@@ -3,7 +3,6 @@ logs*
 tmp
 # files
 go.sum
-.env
 *.exe*
 todo.txt
 *.toml

@@ -79,6 +79,7 @@ func authorizeLogin(ctx *fiber.Ctx) error {
 	}
 	responseToken := fiber.Map{
 		"accessToken": signedToken,
+		"user":        user,
 		"expiresAt":   currentTime.Add(time.Hour).Unix(),
 	}
 	ctx.Status(fiber.StatusOK)

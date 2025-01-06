@@ -26,14 +26,14 @@ func BasicFieldValidation(data reflect.Value, dataType reflect.Type) error {
 				return err
 			}
 		}
-		validateKey, tagPresent := typeField.Tag.Lookup("validate")
-		if !tagPresent {
-			continue
-		}
-		isValid := validate(validateKey, valField.Interface())
-		if !isValid {
-			message := fmt.Sprintf("%s validation failed for - %s", strings.ToTitle(validateKey), typeField.Tag.Get("json"))
-			return errors.New(message)
+		if validateKey, keyPresent := typeField.Tag.Lookup("validate"); keyPresent {
+			for _, key := range strings.Split(validateKey, ",") {
+				isValid := validate(key, valField.Interface())
+				if !isValid {
+					message := fmt.Sprintf("%s validation failed for - %s", strings.ToTitle(validateKey), typeField.Tag.Get("json"))
+					return errors.New(message)
+				}
+			}
 		}
 	}
 	return nil

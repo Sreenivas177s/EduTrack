@@ -22,16 +22,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               sameSite: "strict",
               path: "/",
             })
-            const userResponse = await fetch('http://localhost:3001/api/v1/users/me')
-            const userData = await userResponse.json()
-            console.log(userData)
-            const user = userData["data"];
-            return user
+            return data.user
           } else {
             return null
           }
         } catch (error) {
-          console.log(error.message)
+          console.log(error)
           return null
         }
       },

@@ -76,6 +76,9 @@ func (user *User) ID() uint {
 func (user *User) Validate(httpMethod string) error {
 	return nil
 }
+func (user *User) HandleOperation(operation string) error {
+	return nil
+}
 
 // function option methods
 func (user *User) FillDefaults() error {

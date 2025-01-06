@@ -7,6 +7,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// client - only method
 export async function invokeApi(endpoint: string, method: HttpMethod, queryParams?: Record<string, string | number>, body?: Record<string, unknown>): Promise<ApiResponse> {
   const rInfo: RequestInfo = initializeRequestInfo(endpoint, method, queryParams, body);
   

@@ -109,15 +109,15 @@ func handleGET(ctx *fiber.Ctx) error {
 }
 
 func handleCustomOperation(ctx *fiber.Ctx) error {
-	event := getEntityEvent(ctx)
-	if event == nil {
-		return fiber.NewError(fiber.StatusInternalServerError)
-	}
-	entityType := event.structType
-	fetchedData := reflect.New(entityType)
+	// event := getEntityEvent(ctx)
+	// if event == nil {
+	// 	return fiber.NewError(fiber.StatusInternalServerError)
+	// }
+	// entityType := event.structType
+	// fetchedData := reflect.New(entityType)
 
-	if err := Authorize(fetchedData); err != nil {
-		return err
-	}
+	// if err := Authorize(fetchedData); err != nil {
+	// 	return err
+	// }
 	return ctx.Next()
 }
