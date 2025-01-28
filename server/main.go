@@ -7,21 +7,19 @@ import (
 	"chat-server/utils"
 	"fmt"
 	"os"
-	"path/filepath"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 	// load env variables
-	if err := godotenv.Load(filepath.Join("..", ".env.local")); err != nil {
-		panic("Error while loading env file")
-	}
+	utils.LoadEnv()
 	// initializing data base
 	database.InitDataBase()
 	database.InitializeRedis()
@@ -31,8 +29,7 @@ func main() {
 	// init logger
 	accessLogger := utils.RegisterAccessLogger(app)
 
-	authMiddleware := auth.GetAuthMiddleWare()
-	app.Use(authMiddleware)
+	app.Use(auth.GetAuthMiddleWare())
 	// authorizing apis
 	auth.HandleAuth(app)
 	api.HandleApiCall(app)
@@ -43,9 +40,28 @@ func main() {
 	//print all registered routes in configured-routes.json
 	utils.GenerateConfiguredRoutesJSON(app)
 
-	defer accessLogger.Close()
 	url := fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
-	log.Fatal(app.Listen(url))
+	go func() {
+		if err := app.Listen(url); err != nil {
+			log.Panic(err)
+		}
+	}()
+
+	serverChannel := make(chan os.Signal, 1)                    // Create channel to signify a signal being sent
+	signal.Notify(serverChannel, os.Interrupt, syscall.SIGTERM) // When an interrupt or termination signal is sent, notify the channel
+
+	<-serverChannel // This blocks the main thread until an interrupt is received
+	fmt.Println("Gracefully shutting down...")
+	defer accessLogger.Close()
+	database.CloseRedis()
+	_ = app.Shutdown()
+
+	fmt.Println("Running cleanup tasks...")
+
+	// Your cleanup tasks go here
+	// db.Close()
+	// redisConn.Close()
+	fmt.Println("Fiber was successful shutdown.")
 }
 
 func initAppInstance() *fiber.App {

@@ -65,7 +65,7 @@ func authorizeLogin(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
 	fromClientServer := ctx.Get("Origin")
-	if os.Getenv("USE_COOKIE_AUTH") == "true" && fromClientServer != "nextjs-client" {
+	if fromClientServer != "nextjs-client" {
 		cookieData := &fiber.Cookie{
 			Name:     fiber.HeaderAuthorization,
 			Value:    signedToken,
@@ -98,9 +98,9 @@ func GetAuthMiddleWare() fiber.Handler {
 		Filter:         authFilter,
 	}
 
-	if os.Getenv("USE_COOKIE_AUTH") == "true" {
-		config.TokenLookup = fmt.Sprintf("%s:%s", "cookie", fiber.HeaderAuthorization)
-	}
+	// if os.Getenv("USE_COOKIE_AUTH") == "true" {
+	config.TokenLookup = fmt.Sprintf("%s:%s", "cookie", fiber.HeaderAuthorization)
+	// }
 	return jwtware.New(config)
 }
 
@@ -130,7 +130,7 @@ func authErrorHandler(ctx *fiber.Ctx, err error) error {
 }
 
 func authFilter(ctx *fiber.Ctx) bool {
-	if ctx.Path() == "/auth/login" || ctx.Path() == "/auth/signup" || ctx.Path() == "/auth/logout" || (os.Getenv("DEBUG_MODE") == "true" && ctx.Path() == "/api/v1/users" && ctx.Method() == fiber.MethodPost) {
+	if ctx.Path() == "/auth/login" || ctx.Path() == "/auth/signup" || (os.Getenv("DEBUG_MODE") == "true" && ctx.Path() == "/api/v1/users" && ctx.Method() == fiber.MethodPost) {
 		return true
 	}
 	return false

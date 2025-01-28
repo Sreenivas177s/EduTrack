@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"bytes"
 	"chat-server/api/entity"
 	"chat-server/database"
+	"chat-server/utils"
 	"crypto"
 	"errors"
 	"os"
@@ -21,7 +23,11 @@ func AuthorizeUser(identifier, password string) (*entity.User, error) {
 		if err != nil {
 			return nil, errors.New("invalid credentials")
 		}
-		return user, nil
+		hashedPass, _ := utils.GetHashedPassword(password, user.Salt)
+		result := bytes.Equal(hashedPass, user.HashedPassword)
+		if result {
+			return user, nil
+		}
 	}
 	return nil, errors.New("unable to Find user")
 }

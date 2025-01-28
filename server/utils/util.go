@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"chat-server/api/entity"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -11,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func RegisterAccessLogger(app *fiber.App) *os.File {
@@ -37,21 +37,7 @@ func ServeNotFoundHTML(ctx *fiber.Ctx) error {
 	ctx.Status(fiber.StatusNotFound)
 	return ctx.SendFile(path)
 }
-func ConstructResponse(status int, message string, entity string, responseData entity.ApiEntity) fiber.Map {
-	response := fiber.Map{
-		"status": status,
-	}
-	if message != "" {
-		response["message"] = message
-	}
-	if responseData != nil {
-		response["data"] = responseData
-	}
-	if entity != "" {
-		response["entity"] = entity
-	}
-	return response
-}
+
 func WriteFileAtomic(fileName string, data []byte) error {
 	tmpName := fmt.Sprintf("%s.tmp", fileName)
 	fp, err := os.CreateTemp(".", tmpName)
@@ -86,4 +72,13 @@ func GenerateConfiguredRoutesJSON(app *fiber.App) {
 		log.Fatal(err.Error())
 	}
 	log.Info("Routes file generated ", time.Now().Format(time.DateTime), "...")
+}
+
+func GetHashedPassword(password string, salt []byte) ([]byte, error) {
+	hashBytes := append([]byte(password), salt...)
+	hashedPassword, err := bcrypt.GenerateFromPassword(hashBytes, bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	return hashedPassword, nil
 }

@@ -28,8 +28,9 @@ export function LoginForm({
     },
   })
 
-  const credentialsAction = (values: FormData) => {
-    signIn("credentials", {redirectTo : "/home"}, values)
+  const onSubmit = (values:z.infer<typeof SignInSchema>) => {
+    console.log(values)
+    signIn("credentials", {redirectTo : "/home",...values})
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -39,12 +40,12 @@ export function LoginForm({
         </CardHeader>
         <CardContent>
         <Form {...form}>
-          <form action={credentialsAction}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid gap-6">
               <div className="grid gap-6">
                 <div className="grid gap-2">
-                  {getFormField(form.control, "email_id", "Enter your email")}
-                  {getFormField(form.control, "password", "Enter your Password")}
+                  {getFormField(form.control, "email_id", "Email","Enter your email")}
+                  {getFormField(form.control, "password","password","Enter your Password")}
                 </div>
                 <Button type="submit" className="w-full">
                   Login
@@ -69,14 +70,14 @@ export function LoginForm({
   )
 }
 
-function getFormField(control: Control<z.infer<typeof SignInSchema>>, name: keyof z.infer<typeof SignInSchema>, desc: string) {
+function getFormField(control: Control<z.infer<typeof SignInSchema>>, name: keyof z.infer<typeof SignInSchema>,displayName:string, desc: string) {
   return (
     <FormField control={control} name={name}
       render={({field}) => {
         return (
           <>
             <FormItem>
-                <FormLabel>{name}</FormLabel>
+                <FormLabel>{displayName}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>

@@ -73,14 +73,14 @@ func handlePOST(ctx *fiber.Ctx) error {
 	}
 	//refetch data for post processing
 	insertedDataPointer := reflect.New(inputType)
-	refetchedData := insertedDataPointer.Interface().(entity.ApiEntity)
-	insertedID := inputData.ID()
+	refetchedData := insertedDataPointer.Interface().(entity.Entity)
+	insertedID := inputData.(entity.Entity).ID()
 	dbReference.Take(&refetchedData, insertedID)
 
 	//post persistence handling
 	ExecuteEntityMethod(inputValueAllocatedPointer, utils.METHOD_POST_PROCESSOR, methodParams)
 
-	response := utils.ConstructResponse(fiber.StatusCreated, "Created successfully", event.entityName, refetchedData)
+	response := ConstructResponse(fiber.StatusCreated, "Created successfully", event.entityName, refetchedData.(entity.ApiEntity))
 	ctx.Status(fiber.StatusCreated)
 	return ctx.JSON(response)
 }

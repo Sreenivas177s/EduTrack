@@ -10,6 +10,7 @@ type ApiBase struct {
 }
 
 type Entity interface {
+	ID() uint
 	FillDefaults() error
 	RemoveInternalFields() error
 }
@@ -17,7 +18,6 @@ type Entity interface {
 type ApiEntity interface {
 	Authorize(httpMethod string) (bool, error)
 	Validate(httpMethod string) error
-	ID() uint
 	Preprocessor(httpMethod string) error
 	HandleOperation(operation string) error
 }

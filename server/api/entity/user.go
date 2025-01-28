@@ -1,13 +1,13 @@
 package entity
 
 import (
+	"chat-server/utils"
 	"crypto/rand"
 	"errors"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
-	"golang.org/x/crypto/bcrypt"
+	// "github.com/gofiber/fiber/v2/log"
 )
 
 type User struct {
@@ -47,14 +47,11 @@ func (user *User) Preprocessor(httpMethod string) error {
 		if err != nil {
 			return err
 		}
-		hashBytes := append([]byte(user.Password), salt...)
-		hashedPassword, err := bcrypt.GenerateFromPassword(hashBytes, bcrypt.DefaultCost)
-		if err != nil {
-			return err
+		if hashedPassword, err := utils.GetHashedPassword(user.Password, salt); err == nil {
+			user.Salt = salt
+			user.HashedPassword = hashedPassword
 		}
 
-		user.Salt = salt
-		user.HashedPassword = hashedPassword
 	}
 	return nil
 }
@@ -82,12 +79,12 @@ func (user *User) HandleOperation(operation string) error {
 
 // function option methods
 func (user *User) FillDefaults() error {
-	log.Debug("reached method")
+	// log.Debug("reached method")
 	// user.LastUpdatedTime = time.Now()
 	return nil
 }
 
 func (user *User) RemoveInternalFields() error {
-	log.Debug("reached method")
+	// log.Debug("reached method")
 	return nil
 }
