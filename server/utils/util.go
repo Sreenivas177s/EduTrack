@@ -74,9 +74,8 @@ func GenerateConfiguredRoutesJSON(app *fiber.App) {
 	log.Info("Routes file generated ", time.Now().Format(time.DateTime), "...")
 }
 
-func GetHashedPassword(password string, salt []byte) ([]byte, error) {
-	hashBytes := append([]byte(password), salt...)
-	hashedPassword, err := bcrypt.GenerateFromPassword(hashBytes, bcrypt.DefaultCost)
+func GetHashedPassword(password string) ([]byte, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}

@@ -2,12 +2,11 @@ package entity
 
 import (
 	"chat-server/utils"
-	"crypto/rand"
 	"errors"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	// "github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 type User struct {
@@ -43,27 +42,12 @@ func (user *User) Preprocessor(httpMethod string) error {
 	}
 	// process data
 	if user.Password != "" {
-		salt, err := generateSalt()
-		if err != nil {
-			return err
-		}
-		if hashedPassword, err := utils.GetHashedPassword(user.Password, salt); err == nil {
-			user.Salt = salt
+		if hashedPassword, err := utils.GetHashedPassword(user.Password); err == nil {
 			user.HashedPassword = hashedPassword
 		}
 
 	}
 	return nil
-}
-func generateSalt() ([]byte, error) {
-	salt := make([]byte, 16)
-	if _, err := rand.Read(salt); err != nil {
-		return nil, err
-	}
-	return salt, nil
-}
-func (user *User) SubTables() {
-
 }
 
 func (user *User) ID() uint {
@@ -79,12 +63,12 @@ func (user *User) HandleOperation(operation string) error {
 
 // function option methods
 func (user *User) FillDefaults() error {
-	// log.Debug("reached method")
+	log.Debug("reached method")
 	// user.LastUpdatedTime = time.Now()
 	return nil
 }
 
 func (user *User) RemoveInternalFields() error {
-	// log.Debug("reached method")
+	log.Debug("reached method")
 	return nil
 }

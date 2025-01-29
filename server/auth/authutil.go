@@ -1,13 +1,13 @@
 package auth
 
 import (
-	"bytes"
 	"chat-server/api/entity"
 	"chat-server/database"
-	"chat-server/utils"
 	"crypto"
 	"errors"
 	"os"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type LoginForm struct {
@@ -23,11 +23,11 @@ func AuthorizeUser(identifier, password string) (*entity.User, error) {
 		if err != nil {
 			return nil, errors.New("invalid credentials")
 		}
-		hashedPass, _ := utils.GetHashedPassword(password, user.Salt)
-		result := bytes.Equal(hashedPass, user.HashedPassword)
-		if result {
+		err = bcrypt.CompareHashAndPassword(user.HashedPassword, []byte(password))
+		if err == nil {
 			return user, nil
 		}
+		return nil, err
 	}
 	return nil, errors.New("unable to Find user")
 }
