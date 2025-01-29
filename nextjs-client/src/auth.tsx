@@ -20,7 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               httpOnly: true,
               expires: data.expiresAt,
               sameSite: "strict",
-              path: "/",
+              path: "/ui",
             })
             return {id: data.user.ID, name: data.user.first_name, email: data.user.email_id} as User
           } else {

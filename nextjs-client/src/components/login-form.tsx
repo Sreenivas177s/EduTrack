@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input"
 import { Control, useForm } from "react-hook-form"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
 import { signIn } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
+import { UIAlert } from "./common"
 
 export function LoginForm({
   className,
@@ -29,9 +31,9 @@ export function LoginForm({
   })
 
   const onSubmit = (values:z.infer<typeof SignInSchema>) => {
-    console.log(values)
-    signIn("credentials", {redirectTo : "/home",...values})
+    signIn("credentials", {redirectTo : "/ui/home",...values})
   }
+  const errorMsg = useSearchParams().get("code") === "credentials" ? "Invalid credentials" : null
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -39,13 +41,20 @@ export function LoginForm({
           <CardTitle className="text-xl">Login In</CardTitle>
         </CardHeader>
         <CardContent>
+        {errorMsg && (
+        <UIAlert
+          title="Invalid Credentials"
+          description="The email or password you entered is incorrect."
+          variant="destructive"
+        />
+      )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid gap-6">
               <div className="grid gap-6">
                 <div className="grid gap-2">
                   {getFormField(form.control, "email_id", "Email","Enter your email")}
-                  {getFormField(form.control, "password","password","Enter your Password")}
+                  {getFormField(form.control, "password","Password","Enter your Password")}
                 </div>
                 <Button type="submit" className="w-full">
                   Login
@@ -66,6 +75,7 @@ export function LoginForm({
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.
       </div>
+      
     </div>
   )
 }
