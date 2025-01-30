@@ -15,7 +15,7 @@ var (
 )
 
 // InitializeRedis initializes the Redis client
-func InitializeRedis() {
+func initializeRedis() {
 	redisHost := os.Getenv("REDIS_HOST")
 	redisPort := os.Getenv("REDIS_PORT")
 	rdb = redis.NewClient(&redis.Options{

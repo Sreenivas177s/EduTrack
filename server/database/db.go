@@ -14,12 +14,17 @@ var dbInstance *gorm.DB
 
 func GetDBRef() *gorm.DB {
 	if dbInstance == nil {
-		InitDataBase()
+		initDataBase()
 	}
 	return dbInstance
 }
 
-func InitDataBase() {
+func Init() {
+	initDataBase()
+	initializeRedis()
+}
+
+func initDataBase() {
 	dbParams := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=%s",
 		os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PW"), os.Getenv("POSTGRES_DB"), os.Getenv("POSTGRES_PORT"),
 		os.Getenv("POSTGRES_TIMEZONE"))

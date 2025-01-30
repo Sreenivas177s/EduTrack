@@ -21,8 +21,7 @@ func main() {
 	// load env variables
 	utils.LoadEnv()
 	// initializing data base
-	database.InitDataBase()
-	database.InitializeRedis()
+	database.Init()
 
 	app := initAppInstance()
 
@@ -51,17 +50,17 @@ func main() {
 	signal.Notify(serverChannel, os.Interrupt, syscall.SIGTERM) // When an interrupt or termination signal is sent, notify the channel
 
 	<-serverChannel // This blocks the main thread until an interrupt is received
-	fmt.Println("Gracefully shutting down...")
+	log.Info("Gracefully shutting down...")
 	defer accessLogger.Close()
 	database.CloseRedis()
 	_ = app.Shutdown()
 
-	fmt.Println("Running cleanup tasks...")
+	log.Info("Running cleanup tasks...")
 
 	// Your cleanup tasks go here
 	// db.Close()
 	// redisConn.Close()
-	fmt.Println("Fiber was successful shutdown.")
+	log.Info("Fiber was successful shutdown.")
 }
 
 func initAppInstance() *fiber.App {
