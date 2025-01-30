@@ -4,15 +4,20 @@ import { cookies } from 'next/headers'
 export default async function middleware(req: NextRequest) {
   // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname
-  const isProtectedRoute = path.startsWith('/ui/')
-  const isPublicRoute = path.startsWith('/login') || path.startsWith('/signup')
-  const rootRoute = path === '/'
- 
-  // 3. Decrypt the session from the cookie
+  authRedirects(path,req)
+  
+  // 4. Redirect to /login if the user is not authenticated
+  
+  return NextResponse.next()
+}
+
+const authRedirects = async (path : string, req: NextRequest) => {
   const cookie = (await cookies())
   const token = cookie.get('authjs.session-token')
 
-  // 4. Redirect to /login if the user is not authenticated
+  const isProtectedRoute = path.startsWith('/ui/')
+  const isPublicRoute = path.startsWith('/login') || path.startsWith('/signup')
+  const rootRoute = path === '/'
   if ((isProtectedRoute || rootRoute) && !token) {
     return NextResponse.redirect(new URL('/login', req.nextUrl))
   }
@@ -21,8 +26,6 @@ export default async function middleware(req: NextRequest) {
   if ((isPublicRoute || rootRoute) && token) {
     return NextResponse.redirect(new URL('/ui/home', req.nextUrl))
   }
- 
-  return NextResponse.next()
 }
  
 // Routes Middleware should not run on

@@ -1,6 +1,6 @@
 "use client"
 
-import { cn, SignInSchema } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -12,10 +12,21 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Control, useForm } from "react-hook-form"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../components/ui/form"
 import { signIn } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
-import { UIAlert } from "./common"
+import { UIAlert } from "../../components/common"
+import { TypographyH4 } from "@/components/typography"
+
+const SignInSchema = z.object({
+    email_id: z.string({ required_error: "Email is required" })
+      .min(1, "Email is required")
+      .email("Invalid email"),
+    password: z.string({ required_error: "Password is required" })
+      .min(1, "Password is required")
+      // .min(8, "Password must be more than 8 characters")
+      .max(32, "Password must be less than 32 characters"),
+})
 
 export function LoginForm({
   className,
@@ -33,15 +44,16 @@ export function LoginForm({
   const onSubmit = (values:z.infer<typeof SignInSchema>) => {
     signIn("credentials", {redirectTo : "/ui/home",...values})
   }
-  const errorMsg = useSearchParams().get("code") === "credentials" ? "Invalid credentials" : null
+  const errorParam = useSearchParams().get("code") === "credentials" ? "Invalid credentials" : null
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Login In</CardTitle>
+          <CardTitle className="text-xl">
+              {TypographyH4({message : "Login In"})}</CardTitle>
         </CardHeader>
         <CardContent>
-        {errorMsg && (
+        {errorParam && (
         <UIAlert
           title="Invalid Credentials"
           description="The email or password you entered is incorrect."
@@ -62,7 +74,7 @@ export function LoginForm({
               </div>
               <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <a href="#" className="underline underline-offset-4">
+                <a href="/signup" className="underline underline-offset-4">
                   Sign up
                 </a>
               </div>
