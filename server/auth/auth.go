@@ -64,19 +64,19 @@ func authorizeLogin(ctx *fiber.Ctx) error {
 		log.Errorf("Error signing token: %v", err)
 		return ctx.SendStatus(fiber.StatusInternalServerError)
 	}
-	fromClientServer := ctx.Get("Origin")
-	if fromClientServer != "nextjs-client" {
-		cookieData := &fiber.Cookie{
-			Name:     fiber.HeaderAuthorization,
-			Value:    signedToken,
-			Secure:   os.Getenv("PROD_ENV") == "true",
-			HTTPOnly: true,
-			SameSite: fiber.CookieSameSiteStrictMode,
-			Expires:  currentTime.Add(time.Hour),
-		}
-		ctx.Cookie(cookieData)
-		return ctx.SendStatus(fiber.StatusOK)
-	}
+	// fromClientServer := ctx.Get("Origin")
+	// if fromClientServer != "nextjs-client" {
+	// cookieData := &fiber.Cookie{
+	// 	Name:     fiber.HeaderAuthorization,
+	// 	Value:    signedToken,
+	// 	Secure:   os.Getenv("PROD_ENV") == "true",
+	// 	HTTPOnly: true,
+	// 	SameSite: fiber.CookieSameSiteStrictMode,
+	// 	Expires:  currentTime.Add(time.Hour),
+	// }
+	// ctx.Cookie(cookieData)
+	// return ctx.SendStatus(fiber.StatusOK)
+	// }
 	responseToken := fiber.Map{
 		"accessToken": signedToken,
 		"user":        user,
@@ -97,9 +97,8 @@ func GetAuthMiddleWare() fiber.Handler {
 		ContextKey:     TOKEN_USER,
 		Filter:         authFilter,
 	}
-
 	// if os.Getenv("USE_COOKIE_AUTH") == "true" {
-	config.TokenLookup = fmt.Sprintf("%s:%s", "cookie", fiber.HeaderAuthorization)
+	// config.TokenLookup = fmt.Sprintf("%s:%s", "cookie", fiber.HeaderAuthorization)
 	// }
 	return jwtware.New(config)
 }

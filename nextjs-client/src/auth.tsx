@@ -1,7 +1,6 @@
 import NextAuth, { User } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import { cookies } from "next/headers";
- 
+  
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -15,13 +14,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           console.log(credentials,response.status)
           if (response.status === 200) {
             const data = await response.json()
-            const cookie = await cookies()
-            cookie.set("Authorization", data.accessToken,{
-              httpOnly: true,
-              expires: data.expiresAt,
-              sameSite: "strict",
-              path: "/ui",
-            })
             return {id: data.user.ID, name: data.user.first_name, email: data.user.email_id} as User
           } else {
             return null
